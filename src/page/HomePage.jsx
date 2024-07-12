@@ -38,8 +38,8 @@ const HomePage = () => {
 
   return (
     <>
-    <header className="flex justify-between p-4 border-2 border-b-zinc-800 ">
-        <div className="text-xl font-bold italic">Apna Shop</div>
+    <header className="flex justify-between items-center p-4 border-2 border-b-zinc-800 ">
+        <div className="text-3xl font-bold italic">Apna Shop</div>
         <button className="bg-orange-500 pt-2 pb-2 pl-4 pr-4 rounded-md relative"
         onClick={() => navigate('/cart')}
         ><ShoppingCartIcon sx={{color : 'white'}}/>
