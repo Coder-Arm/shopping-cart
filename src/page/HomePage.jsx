@@ -1,38 +1,30 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import { useDispatch, useSelector } from "react-redux";
-import { manageProducts } from "../Slices/productsSlice";
+import {useSelector } from "react-redux";
+import { useGetProductsQuery } from "../Slices/productsApiSlice";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from "react-router-dom";
-
+import { FidgetSpinner } from "react-loader-spinner";
 const HomePage = () => {
-   const productsState = useSelector(state => state.products);
-   const [data,setData] = useState(productsState);
+   const {data,isLoading,isError} = useGetProductsQuery();
+   console.log('products',data)
+   const [filteredData,setfilteredData] = useState(data?.products);
+   console.log('filteredData',filteredData)
    const [term,setTerm] = useState('');
    const cartState = useSelector(state => state.cart);
-   console.log('productsState',productsState)
-   const dispatch = useDispatch()
   const navigate = useNavigate();
 
+
     useEffect(() => {
-     if(productsState.length > 0){
-       setData(productsState);
+     if(data?.products.length > 0){
+      setfilteredData(data.products);
      }
-     else{
-      async function fetchData(){
-        const response = await axios.get('https://dummyjson.com/products')
-        const products = response.data.products;
-        console.log(products);
-        dispatch(manageProducts(products));
-      } 
-      fetchData()
-     }
-    },[])
+    
+    },[data])
    
     useEffect(() => {
-      const filteredData = productsState.filter(item => item.title.toLowerCase().includes(term.toLowerCase().trim()));
-      setData(filteredData)
+      const filteredData = data?.products.filter(item => item.title.toLowerCase().includes(term.toLowerCase().trim()));
+      setfilteredData(filteredData)
     },[term])
    
 
@@ -52,10 +44,26 @@ const HomePage = () => {
         <div className="flex justify-center">
         <input placeholder="Search product" className="w-[30%] p-2 border-2 border-zinc-800 rounded-md" value={term} onChange={(e) => setTerm(e.target.value)}/>
         </div>
+        {
+          
+          isLoading && <div className="flex justify-center mt-24">
+
+            <FidgetSpinner
+            visible={true}
+            height="150"
+            width="150"
+            ariaLabel="fidget-spinner-loading"
+            backgroundColor="#5d5656"
+            ballColors={['#000000','#000000','#000000']}
+            wrapperStyle={{}}
+            wrapperClass="fidget-spinner-wrapper"
+            />
+          </div>
+        }
       {
-        data && <div className="grid grid-cols-4 mt-8 gap-8 p-2">
+        filteredData?.length>0 && <div className="grid grid-cols-4 mt-8 gap-8 p-2">
           {
-            data.map((item) => {
+            filteredData.map((item) => {
                 return <ProductCard key={item.id} id={item.id} inCart={false}  title={item.title} thumbnail={item.thumbnail} price={item.price} rating={item.rating}/>
             })
           }
